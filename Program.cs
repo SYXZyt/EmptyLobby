@@ -5,6 +5,8 @@ namespace EmptyLobby
 {
     internal static class Program
     {
+        private static bool wasOnCommandLine;
+
         //Most of the code comes from here
         //https://stackoverflow.com/questions/71257/suspend-process-in-c-sharp
         [Flags]
@@ -83,8 +85,22 @@ namespace EmptyLobby
             Console.Write(new string(' ', Console.BufferWidth));
         }
 
+        /// <summary>
+        /// Pauses the application until any key is pressed
+        /// </summary>
+        private static void Pause()
+        {
+            if (wasOnCommandLine) return;
+
+            Console.WriteLine("Press any key");
+            Console.ReadKey();
+        }
+
         private static void Main()
         {
+            //Bit of a bodge, but we don't want to pause if this was ran on the command line, so we check if the console position is 0, 0
+            wasOnCommandLine = Console.GetCursorPosition() != (0, 0);
+
             try
             {
                 ConsolePosition pos = ConsolePosition.Get();
@@ -122,7 +138,6 @@ namespace EmptyLobby
                     _ = ResumeThread(openThread);
                     CloseHandle(openThread);
                 }
-
             }
             //If something went wrong, just give the user an error message to hopefully help them debug the issue
             catch (Exception e)
@@ -130,8 +145,9 @@ namespace EmptyLobby
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine($"Failed To Run Due To Exception:\n{e.Message}");
                 Console.ResetColor();
-                Environment.Exit(1);
             }
+
+            Pause();
         }
     }
 }
