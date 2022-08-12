@@ -96,6 +96,15 @@ namespace EmptyLobby
             Console.ReadKey();
         }
 
+        /// <summary>
+        /// Searches for a process from the given string
+        /// </summary>
+        private static Process[] FindProcess(string processName)
+        {
+            Process[] processes = Process.GetProcessesByName(processName);
+            return processes;
+        }
+
         private static void Main()
         {
             //Bit of a bodge, but we don't want to pause if this was ran on the command line, so we check if the console position is 0, 0
@@ -104,9 +113,12 @@ namespace EmptyLobby
             try
             {
                 ConsolePosition pos = ConsolePosition.Get();
+                Process[] processes;
+                processes = FindProcess("EmptyLobby");
+                if (processes.Length >= 2) throw new("Empty lobby is already running.");
 
                 Console.WriteLine("Looking For 'GTA5'");
-                Process[] processes = Process.GetProcessesByName("GTA5");
+                processes = FindProcess("GTA5");
                 if (processes.Length == 0) throw new("No process called 'GTA5' was found. Make sure GTA V is running");
 
                 ClearLine(pos.top);
